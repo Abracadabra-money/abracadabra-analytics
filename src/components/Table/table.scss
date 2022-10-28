@@ -1,0 +1,37 @@
+.table-wrap {
+    height: calc(100vh - 112px);
+    width: 100%;
+    background-color: #2a2835 !important;
+
+    .table {
+        .MuiDataGrid-columnHeaderTitle, .MuiTablePagination-displayedRows, .MuiDataGrid-cellContent, .MuiSvgIcon-root{
+            color: #fff !important;
+        }
+
+        .MuiDataGrid-overlay {
+            background-color: rgba(255, 255, 255, 0.08) !important;
+            color: #fff !important;
+            .MuiCircularProgress-root{
+                color: #fff !important;
+            }
+        }
+
+        .MuiTablePagination-selectLabel{
+            display: none;
+        }
+
+        .MuiInputBase-root{
+            display: none;
+        }
+
+        .MuiDataGrid-row {
+            &:hover {
+                background-color: rgba(255, 255, 255, 0.1) !important;
+            }
+        }
+
+        .MuiDataGrid-row.primary {
+            background-color: rgba(50, 27, 71, 0.5) !important;
+        }
+    }
+}
