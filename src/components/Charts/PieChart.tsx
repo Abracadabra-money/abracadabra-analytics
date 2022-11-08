@@ -1,13 +1,18 @@
 import ChartWrap from "./ChartWrap";
 import { ResponsiveContainer, PieChart, Pie, Sector, Cell } from "recharts";
-import { SetStateAction, useState } from "react";
+import { SetStateAction, useMemo, useState } from "react";
 import stc from "string-to-color";
 import { format } from "helpers/format";
+
+export interface PieChartData {
+    name: string;
+    value: number;
+}
 
 interface PieChartProps {
     loading: boolean;
     title: string;
-    data: { name: string; value: number }[];
+    data: PieChartData[];
 }
 
 export default function ({ loading, title, data }: PieChartProps) {
@@ -60,15 +65,17 @@ export default function ({ loading, title, data }: PieChartProps) {
         );
     };
 
+    const _data = useMemo(() => data.filter(({ value }) => value > 0), [data]);
+
     return (
-        <ChartWrap title={title} loading={loading} empty={!data.length}>
+        <ChartWrap title={title} loading={loading} empty={!_data.length}>
             <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                     <Pie
                         activeIndex={activeIndex}
                         activeShape={renderActiveShape}
                         onMouseEnter={changeIndexHandler}
-                        data={data}
+                        data={_data}
                         dataKey="value"
                         cx="50%"
                         cy="50%"
@@ -76,7 +83,7 @@ export default function ({ loading, title, data }: PieChartProps) {
                         outerRadius={150}
                         isAnimationActive={false}
                     >
-                        {data.map(({ name }, index) => (
+                        {_data.map(({ name }, index) => (
                             <Cell key={`cell-${index}`} fill={stc(name)} />
                         ))}
                     </Pie>

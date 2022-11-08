@@ -9,6 +9,7 @@ import { groupByNetworks, groupByAsset, groupByNetworksTotals, groupByAssetTotal
 import useFeesTotalsGroup from "hooks/useFeesTotalsGroup";
 import BarChart from "components/Charts/BarChart";
 import PieChart from "components/Charts/PieChart";
+import { useMemo } from "react";
 
 export default function () {
     const feeTotals = useFeesTotals();
@@ -19,10 +20,18 @@ export default function () {
     const feeTotalsAsset = useFeesTotalsGroup("asset");
     const feeTotalsCauldron = useFeesTotalsGroup("cauldron");
 
+    const unregisteredFee = useMemo(() => {
+        let fee = 0;
+        if (feeTotals.totalfees && feeTotals.borrowfees && feeTotals.interestfees && feeTotals.liquidationfee) {
+            fee = feeTotals.totalfees - (feeTotals.borrowfees + feeTotals.interestfees + feeTotals.liquidationfee);
+        }
+        return fee;
+    }, [feeTotals.totalfees, feeTotals.borrowfees, feeTotals.interestfees, feeTotals.liquidationfee]);
+
     return (
         <Box>
             <Grid container spacing={2}>
-                <Grid item xs={12} md={6} lg={3}>
+                <Grid item xs={12}>
                     <StatisticCard lable="Total Fees Generated ($)" type="currency" value={feeTotals.totalfees} loading={feeTotals.loading} />
                 </Grid>
                 <Grid item xs={12} md={6} lg={3}>
@@ -33,6 +42,9 @@ export default function () {
                 </Grid>
                 <Grid item xs={12} md={6} lg={3}>
                     <StatisticCard lable="Liquidation Fees ($)" type="currency" value={feeTotals.liquidationfee} loading={feeTotals.loading} />
+                </Grid>
+                <Grid item xs={12} md={6} lg={3}>
+                    <StatisticCard lable="Unregistered fee ($)" type="currency" value={unregisteredFee} loading={feeTotals.loading} />
                 </Grid>
                 <Grid item xs lg={6}>
                     <PieChart title="Total Fees Generated ($) - By Chain" loading={feeTotalsNetwork.loading} data={groupByNetworksTotals(feeTotalsNetwork.changes)} />
@@ -47,15 +59,12 @@ export default function () {
                     <PieChart
                         title="Total Fees Generated ($) - By Category"
                         loading={feeTotals.loading}
-                        data={
-                            feeTotals?.interestfees && feeTotals?.liquidationfee && feeTotals?.borrowfees
-                                ? [
-                                      { name: "Interest Fees", value: feeTotals?.interestfees ?? 0 },
-                                      { name: "Liquidation Fees", value: feeTotals?.liquidationfee ?? 0 },
-                                      { name: "Borrow Fees", value: feeTotals?.borrowfees ?? 0 },
-                                  ]
-                                : []
-                        }
+                        data={[
+                            { name: "Interest Fees", value: feeTotals?.interestfees ?? 0 },
+                            { name: "Liquidation Fees", value: feeTotals?.liquidationfee ?? 0 },
+                            { name: "Borrow Fees", value: feeTotals?.borrowfees ?? 0 },
+                            { name: "Unregistered fee", value: unregisteredFee },
+                        ]}
                     />
                 </Grid>
                 <Grid item xs lg={6}>
